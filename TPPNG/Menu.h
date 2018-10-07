@@ -53,7 +53,7 @@ public:
 	bool getExitStatus();
 	event_t getKeyboardEvent();
 
-	void encodeImage(void* coder(unsigned char* img, int threshold), int inputT);
+	void encodeImage(bool coder(Image& img, unsigned int threshold), int inputT);
 
 private:
 

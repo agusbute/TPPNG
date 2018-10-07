@@ -19,7 +19,9 @@ public:
 	bool isSelected();
 	void toggleSelect();
 	string getFilename();
-	unsigned int width;	unsigned  int height;	unsigned char * img;		//esto es puntero a bmp
+	unsigned int width;
+	unsigned  int height;
+	unsigned char * img;		//esto es puntero a bmp
 
 	Image& operator=(Image& img);
 	Image& operator=(const char* name);

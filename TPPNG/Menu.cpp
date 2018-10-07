@@ -422,7 +422,7 @@ getExitStatus()
 }
 
 void Menu::
-encodeImage(void* coder(unsigned char* img, int threshold), int inputT)
+encodeImage(bool coder(Image& img, unsigned int threshold), int inputT)
 {
 	bool ret = true;
 	myEvent = { EV_FUNC_BEGIN, FUNC_BEGIN };
@@ -431,7 +431,7 @@ encodeImage(void* coder(unsigned char* img, int threshold), int inputT)
 	{
 		if (onScreenImages[i]->img->isSelected())
 		{
-			ret &= *((bool*)(coder(onScreenImages[i]->img->img, inputT)));
+			ret &= coder(*(onScreenImages[i]->img), inputT);
 		}
 	}
 	myEvent = { EV_FUNC_END, FUNC_END };

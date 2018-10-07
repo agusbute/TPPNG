@@ -33,7 +33,10 @@
     <ClInclude Include="lodepng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parser.h">
+    <ClInclude Include="parselib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="callback.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -56,10 +59,10 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Paser.cpp">
+    <ClCompile Include="parselib.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ParseCommandLine.cpp">
+    <ClCompile Include="callback.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

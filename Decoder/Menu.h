@@ -54,7 +54,7 @@ public:
 	bool getExitStatus();
 	event_t getKeyboardEvent();
 
-	void encodeImage(void* coder(unsigned char* img, int threshold), int inputT);
+	void decodeImage(bool coder(string img));
 
 private:
 
