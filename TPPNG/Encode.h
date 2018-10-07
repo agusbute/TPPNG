@@ -3,6 +3,8 @@
 #include <cmath> 
 using namespace std;
 
+bool Encode(const char * filename, unsigned int treshold);
+
 struct Point
 {
 	int x;

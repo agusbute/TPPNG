@@ -1,6 +1,8 @@
 #pragma once
 #include "stdafx.h"
 #include "Encode.h"
+#include "lodepng.h"
+
 
 QuadTree::QuadTree()
 {
@@ -93,23 +95,21 @@ bool QuadTree::inSquare(Point p)
 		p.y <= botRight.y);
 }
 
-bool Encode(const char * filename,const char * output, unsigned int treshold)
+bool Encode(const char * filename, unsigned int threshold)
 {
 	unsigned w, h;
 	unsigned char * image;												//Arreglo donde se almacenara la informacion de la imagen
 	char buffer[8];
-	ofstream outFile;													//Archivo de salida (para el comprimido)
-	string file(outfile);
-	string fileS = file + ".GKS";										//Creo nombre para el archivo de salida
-	outFile.open(fileS);												//Abro archivo de salida. 
+	ofstream output;													//Archivo de salida (para el comprimido)
+
 	lodepng_decode32_file(&image, &w, &h, filename);					//Decodifico imagen																																	
 	char * hexaSize = _itoa(w*h, buffer, 10);							//Tamano de la imagen en hexadecimal
-	outFile << hexaSize;												//Escribo el tamano en el archivo
-	Encoder(image, outFile, threshold, ignoreAlpha, mode, w, w);
+	output << hexaSize;												//Escribo el tamano en el archivo
+	EncodeRec(image, output, threshold, w, w);
 
 }
 
-void Encoder(unsigned char * pointer, ofstream& outFile, unsigned int threshold, unsigned childL, unsigned originalL)
+void EncodeRec(unsigned char * pointer, ofstream& outFile, unsigned int threshold, unsigned SubArbol, unsigned original)
 {
 	
 }
