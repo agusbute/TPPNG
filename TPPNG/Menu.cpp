@@ -62,6 +62,11 @@ Menu(Image * images_, int number_of_images)
 	page = 0;
 	maxPage = ceil((imageCount / ((double) MAX_MENU_IMG)))-1;
 	myImages = (myImage *) malloc(imageCount * sizeof(myImages));
+	if (myImages == NULL)
+	{
+		err.errorNum = NO_MEM;
+		err.detail = "Error de memoria! Malloc fallido.";
+	}
 	for (int i = 0; i < imageCount; i++)
 	{
 		myImages[i].img = images_ + i;
@@ -78,6 +83,7 @@ Menu::
 	free(myImages);
 	al_uninstall_keyboard();
 	al_destroy_display(display);
+	al_destroy_font(font);
 	al_destroy_event_queue(alEventQueue);
 	al_shutdown_image_addon();
 	al_shutdown_font_addon();
@@ -104,26 +110,52 @@ selectImage(data_t key)
 {
 	if (key == KEY_A)
 	{
-		int end = currImg + MAX_MENU_IMG;
-		while (currImg < end)
+		int save = currImg;
+		//Hago que currImg apunte al primer elemento del display
+		if (save % MAX_MENU_IMG == 0 && save != 0)//caso que estaba apuntando al ultimo elemento
 		{
-			if (!(onScreenImages[currImg - page * MAX_MENU_IMG]->img->isSelected()))
+			save -= MAX_MENU_IMG;
+		}
+		else
+		{
+			while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
 			{
-				onScreenImages[currImg - page * MAX_MENU_IMG]->img->toggleSelect();
+				save--;
 			}
-			currImg++;
+		}
+		int buff = save;
+		while (save < buff + MAX_MENU_IMG && save < imageCount)
+		{
+			if (!(onScreenImages[save]->img->isSelected()))
+			{
+				onScreenImages[save]->img->toggleSelect();
+			}
+			save++;
 		}
 	}
 	else if (key == KEY_N)
 	{
-		int end = currImg + MAX_MENU_IMG;
-		while (currImg < end)
+		int save = currImg;
+		//Hago que currImg apunte al primer elemento del display
+		if (save % MAX_MENU_IMG == 0 && save != 0)//caso que estaba apuntando al ultimo elemento
 		{
-			if ((onScreenImages[currImg - page * MAX_MENU_IMG]->img->isSelected()))
+			save -= MAX_MENU_IMG;
+		}
+		else
+		{
+			while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
 			{
-				onScreenImages[currImg - page * MAX_MENU_IMG]->img->toggleSelect();
+				save--;
 			}
-			currImg++;
+		}
+		int buff = save;
+		while (save < buff + MAX_MENU_IMG && save < imageCount)
+		{
+			if ((onScreenImages[save]->img->isSelected()))
+			{
+				onScreenImages[save]->img->toggleSelect();
+			}
+			save++;
 		}
 	}
 	else if(key != KEY_ESC && key != KEY_ENTER && key != KEY_LEFT && key != KEY_RIGHT && key != KEY_NONE && key != KEY_UP)
@@ -176,7 +208,7 @@ updateMenu()
 	else
 	{
 		double x, y;
-		x = (COL_SIZE / 2.0) + MARGIN;
+		y = (IMG_SIZE / 2.0) + MARGIN / 2.0;
 		//Hago que currImg apunte al primer elemento del display
 		if (currImg % MAX_MENU_IMG == 0 && currImg != 0)//caso que estaba apuntando al ultimo elemento
 		{
@@ -190,12 +222,12 @@ updateMenu()
 			}
 		}
 		int buff = currImg;
-		while (currImg < buff + MAX_MENU_IMG || currImg < imageCount)
+		while (currImg < buff + MAX_MENU_IMG && currImg < imageCount)
 		{
-			for (int i = 0; i < (MAX_MENU_IMG / 3) && !(currImg < buff + MAX_MENU_IMG); i++)
+			for (int j = 0; j < (MAX_MENU_IMG / 3) && (currImg < buff + MAX_MENU_IMG); j++)
 			{
-				y = (IMG_SIZE / 2.0) + MARGIN/2.0;
-				for (int j = 0; j < (MAX_MENU_IMG / 3) && !(currImg < buff + MAX_MENU_IMG); j++)
+				x = (COL_SIZE / 2.0) + MARGIN;
+				for (int i = 0; i < (MAX_MENU_IMG / 3) && (currImg < buff + MAX_MENU_IMG); i++)
 				{
 					//Marcador de imagenes seleccionadas(se hace un contorno amarillo de la imagen):
 					
@@ -216,10 +248,10 @@ updateMenu()
 					 al_draw_text(font, al_map_rgb(0, 0, 0), x, y + IMG_SIZE / 2.0 + MARGIN / 2.0, ALLEGRO_ALIGN_CENTRE, myImages[currImg].img->getFilename().c_str());
 					
 					currImg++;
-					y += (IMG_SIZE + MARGIN);
+					x += (COL_SIZE + MARGIN);
 					al_flip_display();
 				}
-				x += (COL_SIZE + MARGIN);
+				y += (IMG_SIZE + MARGIN);
 			}
 		}
 	}
@@ -239,142 +271,95 @@ getKeyboardEvent()
 
 			switch (alEvent.keyboard.keycode)
 			{
-			case ALLEGRO_KEY_UP:
-			{
-				answerEvent.eventData = KEY_UP;
-				break;
-			}
+				case ALLEGRO_KEY_UP:
+				{
+					answerEvent.eventData = KEY_UP;
+					break;
+				}
 
-			case ALLEGRO_KEY_RIGHT:
-			{
-				answerEvent.eventData = KEY_RIGHT;
-				break;
-			}
+				case ALLEGRO_KEY_RIGHT:
+				{
+					answerEvent.eventData = KEY_RIGHT;
+					break;
+				}
 
-			case ALLEGRO_KEY_LEFT:
-			{
-				answerEvent.eventData = KEY_LEFT;
-				break;
-			}
+				case ALLEGRO_KEY_LEFT:
+				{
+					answerEvent.eventData = KEY_LEFT;
+					break;
+				}
 
-			case ALLEGRO_KEY_N:
-			{
-				answerEvent.eventData = KEY_N;
-				break;
-			}
+				case ALLEGRO_KEY_N:
+				{
+					answerEvent.eventData = KEY_N;
+					break;
+				}
 
-			case ALLEGRO_KEY_A:
-			{
-				answerEvent.eventData = KEY_A;
-				break;
-			}
-			case ALLEGRO_KEY_ENTER:
-			{
-				answerEvent.eventData = KEY_ENTER;
-				break;
-			}
-			case ALLEGRO_KEY_1: case ALLEGRO_KEY_PAD_1:
-			{
-				answerEvent.eventData = KEY_1;
-				break;
-			}
-			case ALLEGRO_KEY_2: case ALLEGRO_KEY_PAD_2:
-			{
-				answerEvent.eventData = KEY_2;
-				break;
-			}
-			case ALLEGRO_KEY_3: case ALLEGRO_KEY_PAD_3:
-			{
-				answerEvent.eventData = KEY_3;
-				break;
-			}
-			case ALLEGRO_KEY_4: case ALLEGRO_KEY_PAD_4:
-			{
-				answerEvent.eventData = KEY_2;
-				break;
-			}
-			case ALLEGRO_KEY_5: case ALLEGRO_KEY_PAD_5:
-			{
-				answerEvent.eventData = KEY_5;
-				break;
-			}
-			case ALLEGRO_KEY_6: case ALLEGRO_KEY_PAD_6:
-			{
-				answerEvent.eventData = KEY_6;
-				break;
-			}
-			case ALLEGRO_KEY_7: case ALLEGRO_KEY_PAD_7:
-			{
-				answerEvent.eventData = KEY_7;
-				break;
-			}
-			case ALLEGRO_KEY_8: case ALLEGRO_KEY_PAD_8:
-			{
-				answerEvent.eventData = KEY_8;
-				break;
-			}
-			case ALLEGRO_KEY_9: case ALLEGRO_KEY_PAD_9:
-			{
-				answerEvent.eventData = KEY_9;
-				break;
-			}
-			case ALLEGRO_KEY_ESCAPE:
-			{
-				answerEvent.eventData = KEY_ESC;
-				exit = true;
-				break;
-			}
-			default:
-			{
-				answerEvent.eventData = KEY_NONE;
-			}
-			}
-		}
-		else if (alEvent.type == ALLEGRO_EVENT_KEY_UP)
-		{
-			answerEvent.eventType = EV_KEY_UP;
-
-			switch (alEvent.keyboard.keycode)
-			{
-			case ALLEGRO_KEY_UP:
-			{
-				answerEvent.eventData = KEY_UP;
-				break;
-			}
-
-			case ALLEGRO_KEY_RIGHT:
-			{
-				answerEvent.eventData = KEY_RIGHT;
-				break;
-			}
-
-			case ALLEGRO_KEY_LEFT:
-			{
-				answerEvent.eventData = KEY_LEFT;
-				break;
-			}
-
-			case ALLEGRO_KEY_N:
-			{
-				answerEvent.eventData = KEY_N;
-				break;
-			}
-
-			case ALLEGRO_KEY_A:
-			{
-				answerEvent.eventData = KEY_A;
-				break;
-			}
-			case ALLEGRO_KEY_ESCAPE:
-			{
-				answerEvent.eventData = KEY_ESC;
-				exit = true;
-				break;
-			}
-			default:
-			{
-				answerEvent.eventData = KEY_NONE;
-			}
+				case ALLEGRO_KEY_A:
+				{
+					answerEvent.eventData = KEY_A;
+					break;
+				}
+				case ALLEGRO_KEY_ENTER:
+				{
+					answerEvent.eventData = KEY_ENTER;
+					break;
+				}
+				case ALLEGRO_KEY_1: case ALLEGRO_KEY_PAD_1:
+				{
+					answerEvent.eventData = KEY_1;
+					break;
+				}
+				case ALLEGRO_KEY_2: case ALLEGRO_KEY_PAD_2:
+				{
+					answerEvent.eventData = KEY_2;
+					break;
+				}
+				case ALLEGRO_KEY_3: case ALLEGRO_KEY_PAD_3:
+				{
+					answerEvent.eventData = KEY_3;
+					break;
+				}
+				case ALLEGRO_KEY_4: case ALLEGRO_KEY_PAD_4:
+				{
+					answerEvent.eventData = KEY_4;
+					break;
+				}
+				case ALLEGRO_KEY_5: case ALLEGRO_KEY_PAD_5:
+				{
+					answerEvent.eventData = KEY_5;
+					break;
+				}
+				case ALLEGRO_KEY_6: case ALLEGRO_KEY_PAD_6:
+				{
+					answerEvent.eventData = KEY_6;
+					break;
+				}
+				case ALLEGRO_KEY_7: case ALLEGRO_KEY_PAD_7:
+				{
+					answerEvent.eventData = KEY_7;
+					break;
+				}
+				case ALLEGRO_KEY_8: case ALLEGRO_KEY_PAD_8:
+				{
+					answerEvent.eventData = KEY_8;
+					break;
+				}
+				case ALLEGRO_KEY_9: case ALLEGRO_KEY_PAD_9:
+				{
+					answerEvent.eventData = KEY_9;
+					break;
+				}
+				case ALLEGRO_KEY_ESCAPE:
+				{
+					answerEvent.eventData = KEY_ESC;
+					exit = true;
+					break;
+				}
+				default:
+				{
+					answerEvent.eventData = KEY_NONE;
+				}
 			}
 		}
 		else if (alEvent.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
