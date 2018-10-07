@@ -56,6 +56,7 @@ public:
 
 private:
 
+	void updateOnScreenImages(int page_);
 	void updateOnScreenImages();
 	bool codeImage(void* coder(Image * img));
 	myImage * myImages;

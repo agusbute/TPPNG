@@ -60,8 +60,15 @@ Menu(Image * images_, int number_of_images)
 	imageCount = number_of_images;
 	currImg = 0;
 	page = 0;
-	maxPage = ceil((imageCount / ((double) MAX_MENU_IMG)))-1;
-	myImages = (myImage *) malloc(imageCount * sizeof(myImages));
+	if (imageCount < MAX_MENU_IMG)
+	{
+		maxPage = 0;
+	}
+	else
+	{
+		maxPage = floor((imageCount / ((double)MAX_MENU_IMG)));
+	}
+	myImages = (myImage *) malloc(number_of_images * sizeof(*myImages));
 	if (myImages == NULL)
 	{
 		err.errorNum = NO_MEM;
@@ -118,7 +125,7 @@ selectImage(data_t key)
 		}
 		else
 		{
-			while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
+			while (!(save % MAX_MENU_IMG == 0))//cualquier otro elemento
 			{
 				save--;
 			}
@@ -126,9 +133,9 @@ selectImage(data_t key)
 		int buff = save;
 		while (save < buff + MAX_MENU_IMG && save < imageCount)
 		{
-			if (!(onScreenImages[save]->img->isSelected()))
+			if (!(onScreenImages[save-buff]->img->isSelected()))
 			{
-				onScreenImages[save]->img->toggleSelect();
+				onScreenImages[save - buff]->img->toggleSelect();
 			}
 			save++;
 		}
@@ -143,7 +150,7 @@ selectImage(data_t key)
 		}
 		else
 		{
-			while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
+			while (!(save % MAX_MENU_IMG == 0))//cualquier otro elemento
 			{
 				save--;
 			}
@@ -151,27 +158,32 @@ selectImage(data_t key)
 		int buff = save;
 		while (save < buff + MAX_MENU_IMG && save < imageCount)
 		{
-			if ((onScreenImages[save]->img->isSelected()))
+			if ((onScreenImages[save - buff]->img->isSelected()))
 			{
-				onScreenImages[save]->img->toggleSelect();
+				onScreenImages[save - buff]->img->toggleSelect();
 			}
 			save++;
 		}
 	}
 	else if(key != KEY_ESC && key != KEY_ENTER && key != KEY_LEFT && key != KEY_RIGHT && key != KEY_NONE && key != KEY_UP)
 	{
-		onScreenImages[key]->img->toggleSelect();
+		if (onScreenImages[key] != NULL)
+		{
+			onScreenImages[key]->img->toggleSelect();
+		}
 	}
 }
 
 void Menu::
 changePage(data_t key)
 {
+	int buff = page;
 	if (key == KEY_LEFT)
 	{
 		if (page > 0)
 		{
 			page--;
+			updateOnScreenImages(buff);
 		}
 	}
 	else if (key == KEY_RIGHT)
@@ -179,17 +191,44 @@ changePage(data_t key)
 		if (page < maxPage)
 		{
 			page++;
+			updateOnScreenImages(buff);
 		}
 	}
-	updateOnScreenImages();
+	
 }
 
 void Menu::
+updateOnScreenImages(int page_)
+{
+	for (int j = 0; j < MAX_MENU_IMG; j++)
+	{
+		onScreenImages[j] = NULL;
+	}
+	if (page_ > page)
+	{
+		while (!(currImg % MAX_MENU_IMG == 0))
+		{
+			currImg--;
+		}
+		currImg = currImg - MAX_MENU_IMG;
+	}
+	int buff = currImg;
+	for (currImg; (currImg < (buff + MAX_MENU_IMG)) && (currImg < imageCount); currImg++)
+	{
+		onScreenImages[(currImg - buff)] = &myImages[currImg];
+	}
+}
+void Menu::
 updateOnScreenImages()
 {
-	for (int i = currImg; i < (currImg + MAX_MENU_IMG); i++)
+	for (int j = 0; j < MAX_MENU_IMG; j++)
 	{
-		onScreenImages[(i - currImg)] = &myImages[i];
+		onScreenImages[j] = NULL;
+	}
+	int buff = currImg;
+	for (currImg; (currImg < (buff + MAX_MENU_IMG)) && (currImg < imageCount); currImg++)
+	{
+		onScreenImages[(currImg - buff)] = &myImages[currImg];
 	}
 }
 
@@ -230,26 +269,30 @@ updateMenu()
 				for (int i = 0; i < (MAX_MENU_IMG / 3) && (currImg < buff + MAX_MENU_IMG); i++)
 				{
 					//Marcador de imagenes seleccionadas(se hace un contorno amarillo de la imagen):
-					
-					if(onScreenImages[(currImg - (page*MAX_MENU_IMG))]->img->isSelected())
+					if (onScreenImages[(currImg - (page*MAX_MENU_IMG))] != NULL)
 					{
-						al_draw_filled_rectangle((x - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-												(y - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-												(x + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
-												(y + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
-												al_map_rgb(255,255,0));
+						if (onScreenImages[(currImg - (page*MAX_MENU_IMG))]->img->isSelected())
+						{
+							al_draw_filled_rectangle((x - (IMG_SIZE / 2.0) - (MARGIN / 5.0)),
+								(y - (IMG_SIZE / 2.0) - (MARGIN / 5.0)),
+								(x + (IMG_SIZE / 2.0) + (MARGIN / 5.0)),
+								(y + (IMG_SIZE / 2.0) + (MARGIN / 5.0)),
+								al_map_rgb(255, 255, 0));
+						}
+
+						al_draw_scaled_bitmap(myImages[currImg].bmp,
+							0, 0,
+							al_get_bitmap_width(myImages[currImg].bmp), al_get_bitmap_height(myImages[currImg].bmp),
+							(x - (IMG_SIZE / 2.0)), (y - (IMG_SIZE / 2.0)),
+							IMG_SIZE, IMG_SIZE, 0);
+						al_draw_text(font, al_map_rgb(0, 0, 0), x, y + IMG_SIZE / 2.0 + MARGIN / 2.0, ALLEGRO_ALIGN_CENTRE, myImages[currImg].img->getFilename().c_str());
+						
+						string pageNumber = to_string(page+1) + "/" + to_string(maxPage+1);
+						al_draw_text(font, al_map_rgb(0, 0, 0), WIDTH - MARGIN / 2.0, HEIGHT - MARGIN / 2.0, ALLEGRO_ALIGN_CENTRE, pageNumber.c_str());
+						currImg++;
+						x += (COL_SIZE + MARGIN);
+						al_flip_display();
 					}
-					
-					 al_draw_scaled_bitmap(myImages[currImg].bmp,
-											0, 0,
-											al_get_bitmap_width(myImages[currImg].bmp), al_get_bitmap_height(myImages[currImg].bmp),
-											(x - (IMG_SIZE/2.0)), (y - (IMG_SIZE/2.0)),
-											IMG_SIZE, IMG_SIZE, 0);
-					 al_draw_text(font, al_map_rgb(0, 0, 0), x, y + IMG_SIZE / 2.0 + MARGIN / 2.0, ALLEGRO_ALIGN_CENTRE, myImages[currImg].img->getFilename().c_str());
-					
-					currImg++;
-					x += (COL_SIZE + MARGIN);
-					al_flip_display();
 				}
 				y += (IMG_SIZE + MARGIN);
 			}
