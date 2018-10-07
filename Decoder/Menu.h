@@ -1,7 +1,8 @@
 #pragma once
+#pragma once
 #include "stdafx.h"
 #include "Image.h"
-#include "Encode.h"
+#include "Decoder.h"
 
 #define HEIGHT 600
 #define WIDTH 1000
@@ -23,8 +24,8 @@ typedef struct
 	string detail;
 }errorType_t;
 
-typedef enum { NONE, KEY_DOWN, EV_KEY_UP, EV_FUNC_END, EV_FUNC_BEGIN}evType_t;
-typedef enum { KEY_1 = 0, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_NONE, KEY_LEFT, KEY_RIGHT, KEY_A, KEY_N, KEY_ESC, FUNC_END, FUNC_BEGIN, KEY_ENTER, KEY_UP}data_t;
+typedef enum { NONE, KEY_DOWN, EV_KEY_UP, EV_FUNC_END, EV_FUNC_BEGIN }evType_t;
+typedef enum { KEY_1 = 0, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_NONE, KEY_LEFT, KEY_RIGHT, KEY_A, KEY_N, KEY_ESC, FUNC_END, FUNC_BEGIN, KEY_ENTER, KEY_UP }data_t;
 
 typedef struct
 {

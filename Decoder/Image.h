@@ -13,9 +13,9 @@ typedef struct
 class Image
 {
 public:
-	
+
 	Image();
-	Image(string filename); 
+	Image(string filename);
 	bool isSelected();
 	void toggleSelect();
 	string getFilename();

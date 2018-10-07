@@ -12,7 +12,7 @@ Image::Image()
 Image::Image(string filename)
 {
 	this->filename = filename;
-	lodepng_decode32_file(&img,&width,&height,filename.c_str());
+	lodepng_decode32_file(&img, &width, &height, filename.c_str());
 	selected = false;
 }
 
