@@ -1,10 +1,10 @@
+#include "stdafx.h"
 #include "menu.h"
 
 Menu::
 Menu(Image * images_, int number_of_images)
 {
-	err = { NO_ERROR, "No error." };
-	event = { NONE, KEY_NONE };
+	err = { NO_ERR, "No error." };
 	if (!(al_init()))
 	{
 		err.errorNum = AL_INIT_ERROR;
@@ -42,15 +42,18 @@ Menu(Image * images_, int number_of_images)
 		err.errorNum = AL_QUEUE_ERROR;
 		err.detail = (stderr, "failed to create event_queue!\n");
 	}
+	al_register_event_source(alEventQueue, al_get_keyboard_event_source());
+	al_register_event_source(alEventQueue, al_get_display_event_source(display));
 
 	imageCount = number_of_images;
 	currImg = 0;
 	page = 0;
-	maxPage = ceil((imageCount / ((double) MAX_MENU_IMG)));
-	for (int i = 0; i < imageCount; i++)
+	maxPage = ceil((imageCount / ((double) MAX_MENU_IMG)))-1;
+	/*for (int i = 0; i < imageCount; i++)
 	{
-		myImages[i].img = &images_[i];
-	}
+		myImages[i].img = images_;
+		images_++;
+	}*/
 }
 
 Menu::
@@ -68,12 +71,12 @@ Menu::
 	al_shutdown_primitives_addon();
 }
 
-bool Menu::
+void Menu::
 openImages()
 {
 	for (int i = 0; i < imageCount; i++)
 	{
-		myImages[i].bmp = al_load_bitmap(myImages[i].img->getFilename);
+		myImages[i].bmp = al_load_bitmap(myImages[i].img->getFilename().c_str());
 	}
 }
 
@@ -89,6 +92,7 @@ selectImage(data_t key)
 			{
 				onScreenImages[currImg - page * MAX_MENU_IMG]->img->toggleSelect();
 			}
+			currImg++;
 		}
 	}
 	else if (key == KEY_N)
@@ -100,6 +104,7 @@ selectImage(data_t key)
 			{
 				onScreenImages[currImg - page * MAX_MENU_IMG]->img->toggleSelect();
 			}
+			currImg++;
 		}
 	}
 	else
@@ -140,166 +145,181 @@ updateOnScreenImages()
 void Menu::
 updateMenu()
 {
-	double pos[] = { 0.0, 0.0 };
-	pos[0] += (COL_SIZE / 2.0) + MARGIN; //me paro en el centro(en cuanto a x) de la primera 'columna'
-	pos[1] += (IMG_SIZE / 2.0) + MARGIN;
-
+	double x, y;
+	x = (COL_SIZE / 2.0) + MARGIN;
+	//Hago que currImg apunte al primer elemento del display
+	if (currImg % MAX_MENU_IMG == 0 && currImg != 0)//caso que estaba apuntando al ultimo elemento
+	{
+		currImg -= MAX_MENU_IMG;
+	}
+	else
+	{
+		while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
+		{
+			currImg--;
+		}
+	}
 	al_clear_to_color(al_map_rgb(255, 255, 255));
-
-	while (currImg < MAX_MENU_IMG || currImg < imageCount)
+	int buff = currImg;
+	while (currImg < buff + MAX_MENU_IMG || currImg < imageCount)
 	{
 		for (int i = 0; i < (MAX_MENU_IMG / 3); i++)
 		{
+			y = (IMG_SIZE / 2.0) + MARGIN;
 			for (int j = 0; j < (MAX_MENU_IMG / 3); j++)
 			{
 				//Marcador de imagenes seleccionadas(se hace un contorno amarillo de la imagen):
 				/*
 				if(onScreenImages[(currImg - (page*MAX_MENU_IMG))]->isSelected())
 				{
-					al_draw_filled_rectangle((pos[0] - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-											(pos[1] - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-											(pos[0] + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
-											(pos[1] - (IMG_SIZE/2.0) + (MARGIN / 5.0)),
+					al_draw_filled_rectangle((x - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
+											(y - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
+											(x + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
+											(y + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
 											al_map_rgb(255,255,0));
 				}
 				*/
-				al_draw_filled_rectangle((pos[0] - (IMG_SIZE / 2.0)),
-					(pos[1] - (IMG_SIZE / 2.0)),
-					(pos[0] + (IMG_SIZE / 2.0)),
-					(pos[1] - (IMG_SIZE / 2.0)),
+
+				al_draw_filled_rectangle((x - (IMG_SIZE / 2.0)),
+					(y - (IMG_SIZE / 2.0)),
+					(x + (IMG_SIZE / 2.0)),
+					(y + (IMG_SIZE / 2.0)),
 					al_map_rgb(255, 0, 0));
 				//cambiar por:
 				/* al_draw_scaled_bitmap(myImages[currImg].bmp,
 										0, 0,
-										get_bitmap_width(bmps[currImg]), get_bitmap_height(bmps[currImg]),
-										(pos[0] - (IMG_SIZE/2.0)), (pos[1] - (IMG_SIZE/2.0)),
+										get_bitmap_width(myImages[currImg].bmp), get_bitmap_height(myImages[currImg].bmp),
+										(x - (IMG_SIZE/2.0)), (y - (IMG_SIZE/2.0)),
 										IMG_SIZE, IMG_SIZE, 0);
 				*/
 				currImg++;
-				pos[1] += (IMG_SIZE + MARGIN);
+				y += (IMG_SIZE + MARGIN);
 			}
-			pos[0] += ((((COL_SIZE / 2.0) + MARGIN) * 2.0) + (COL_SIZE / 2.0) + (MARGIN / 2.0));
+			x += (COL_SIZE + MARGIN);
 		}
 	}
+	al_flip_display();
 }
 
 event_t Menu::
 getKeyboardEvent()
 {
 	event_t answerEvent = { NONE, KEY_NONE };
-
-	if (alEvent.type == ALLEGRO_EVENT_KEY_DOWN)
+	if (al_get_next_event(alEventQueue, &alEvent))
 	{
-		answerEvent.eventType = KEY_DOWN;
 
-		switch (alEvent.keyboard.keycode)
+		if (alEvent.type == ALLEGRO_EVENT_KEY_DOWN)
 		{
-		case ALLEGRO_KEY_UP:
-		{
-			answerEvent.eventData = KEY_UP;
-			break;
-		}
+			answerEvent.eventType = KEY_DOWN;
 
-		case ALLEGRO_KEY_RIGHT:
-		{
-			answerEvent.eventData = KEY_RIGHT;
-			break;
-		}
-
-		case ALLEGRO_KEY_LEFT:
-		{
-			answerEvent.eventData = KEY_LEFT;
-			break;
-		}
-
-		case ALLEGRO_KEY_N:
-		{
-			answerEvent.eventData = KEY_N;
-			break;
-		}
-
-		case ALLEGRO_KEY_A:
-		{
-			answerEvent.eventData = KEY_A;
-			break;
-		}
-		case ALLEGRO_KEY_ENTER:
-		{
-			answerEvent.eventData = KEY_ENTER;
-			break;
-		}
-		case ALLEGRO_KEY_1: case ALLEGRO_KEY_PAD_1:
-		{
-			answerEvent.eventData = KEY_1;
-			break;
-		}
-		case ALLEGRO_KEY_2: case ALLEGRO_KEY_PAD_2:
-		{
-			answerEvent.eventData = KEY_2;
-			break;
-		}
-		case ALLEGRO_KEY_3: case ALLEGRO_KEY_PAD_3:
-		{
-			answerEvent.eventData = KEY_3;
-			break;
-		}
-		case ALLEGRO_KEY_4: case ALLEGRO_KEY_PAD_4:
-		{
-			answerEvent.eventData = KEY_2;
-			break;
-		}
-		case ALLEGRO_KEY_5: case ALLEGRO_KEY_PAD_5:
-		{
-			answerEvent.eventData = KEY_5;
-			break;
-		}
-		case ALLEGRO_KEY_6: case ALLEGRO_KEY_PAD_6:
-		{
-			answerEvent.eventData = KEY_6;
-			break;
-		}
-		case ALLEGRO_KEY_7: case ALLEGRO_KEY_PAD_7:
-		{
-			answerEvent.eventData = KEY_7;
-			break;
-		}
-		case ALLEGRO_KEY_8: case ALLEGRO_KEY_PAD_8:
-		{
-			answerEvent.eventData = KEY_8;
-			break;
-		}
-		case ALLEGRO_KEY_9: case ALLEGRO_KEY_PAD_9:
-		{
-			answerEvent.eventData = KEY_9;
-			break;
-		}
-		case ALLEGRO_KEY_ESCAPE:
-		{
-			answerEvent.eventData = KEY_ESC;
-			exit = true;
-			break;
-		}
-		default:
-		{
-			answerEvent.eventData = KEY_NONE;
-		}
-		}
-	}
-	/*else if (alEvent.eventType == ALLEGRO_EVENT_KEY_UP)
-	{
-		answerEvent.eventType = EVENT_KEY_UP;
-
-		switch (alEvent.keyboard.keycode)
-		{
+			switch (alEvent.keyboard.keycode)
+			{
 			case ALLEGRO_KEY_UP:
 			{
-				answerEvent.eventData = EVENT_DATA_KEY_UP;
+				answerEvent.eventData = KEY_UP;
 				break;
 			}
 
 			case ALLEGRO_KEY_RIGHT:
 			{
-				answerEvent.eventData = RIGHT;
+				answerEvent.eventData = KEY_RIGHT;
+				break;
+			}
+
+			case ALLEGRO_KEY_LEFT:
+			{
+				answerEvent.eventData = KEY_LEFT;
+				break;
+			}
+
+			case ALLEGRO_KEY_N:
+			{
+				answerEvent.eventData = KEY_N;
+				break;
+			}
+
+			case ALLEGRO_KEY_A:
+			{
+				answerEvent.eventData = KEY_A;
+				break;
+			}
+			case ALLEGRO_KEY_ENTER:
+			{
+				answerEvent.eventData = KEY_ENTER;
+				break;
+			}
+			case ALLEGRO_KEY_1: case ALLEGRO_KEY_PAD_1:
+			{
+				answerEvent.eventData = KEY_1;
+				break;
+			}
+			case ALLEGRO_KEY_2: case ALLEGRO_KEY_PAD_2:
+			{
+				answerEvent.eventData = KEY_2;
+				break;
+			}
+			case ALLEGRO_KEY_3: case ALLEGRO_KEY_PAD_3:
+			{
+				answerEvent.eventData = KEY_3;
+				break;
+			}
+			case ALLEGRO_KEY_4: case ALLEGRO_KEY_PAD_4:
+			{
+				answerEvent.eventData = KEY_2;
+				break;
+			}
+			case ALLEGRO_KEY_5: case ALLEGRO_KEY_PAD_5:
+			{
+				answerEvent.eventData = KEY_5;
+				break;
+			}
+			case ALLEGRO_KEY_6: case ALLEGRO_KEY_PAD_6:
+			{
+				answerEvent.eventData = KEY_6;
+				break;
+			}
+			case ALLEGRO_KEY_7: case ALLEGRO_KEY_PAD_7:
+			{
+				answerEvent.eventData = KEY_7;
+				break;
+			}
+			case ALLEGRO_KEY_8: case ALLEGRO_KEY_PAD_8:
+			{
+				answerEvent.eventData = KEY_8;
+				break;
+			}
+			case ALLEGRO_KEY_9: case ALLEGRO_KEY_PAD_9:
+			{
+				answerEvent.eventData = KEY_9;
+				break;
+			}
+			case ALLEGRO_KEY_ESCAPE:
+			{
+				answerEvent.eventData = KEY_ESC;
+				exit = true;
+				break;
+			}
+			default:
+			{
+				answerEvent.eventData = KEY_NONE;
+			}
+			}
+		}
+		else if (alEvent.type == ALLEGRO_EVENT_KEY_UP)
+		{
+			answerEvent.eventType = EV_KEY_UP;
+
+			switch (alEvent.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_UP:
+			{
+				answerEvent.eventData = KEY_UP;
+				break;
+			}
+
+			case ALLEGRO_KEY_RIGHT:
+			{
+				answerEvent.eventData = KEY_RIGHT;
 				break;
 			}
 
@@ -330,13 +350,13 @@ getKeyboardEvent()
 			{
 				answerEvent.eventData = KEY_NONE;
 			}
+			}
 		}
-	}*/
-	else if (alEvent.keyboard.keycode == ALLEGRO_EVENT_DISPLAY_CLOSE)
-	{
-		exit = true;
+		else if (alEvent.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+		{
+			exit = true;
+		}
 	}
-
 	return answerEvent;
 }
 
@@ -347,10 +367,19 @@ getExitStatus()
 }
 
 void Menu::
+execute()
+{
+	
+}
+
+bool Menu::
+codeImage(void* coder(Image * img))
+{
+	return true;
+}
+
+void Menu::
 printError()
 {
-	if (err.errorNum != NO_ERROR)
-	{
-		std::cout << err.detail << std::endl;
-	}
+	cout << err.detail.c_str() << endl;
 }

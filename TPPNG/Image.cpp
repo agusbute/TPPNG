@@ -22,6 +22,7 @@ Image& Image::operator=(Image& img)
 	this->height = img.height;
 	this->width = img.width;
 	this->img = img.img;
+	return *this;
 }
 
 bool Image::isSelected()

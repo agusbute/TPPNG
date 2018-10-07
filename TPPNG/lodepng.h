@@ -1,5 +1,5 @@
 #pragma once
-
+#include "stdafx.h"
 /*
 LodePNG version 20180910
 
