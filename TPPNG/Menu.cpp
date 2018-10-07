@@ -4,6 +4,7 @@
 Menu::
 Menu(Image * images_, int number_of_images)
 {
+	myEvent = { NONE, KEY_NONE };
 	err = { NO_ERR, "No error." };
 	if (!(al_init()))
 	{
@@ -20,6 +21,11 @@ Menu(Image * images_, int number_of_images)
 		err.errorNum = AL_ADDON_ERROR;
 		err.detail = "Error al iniciar el Font Addon de Allegro!";
 	}
+	if (!al_init_ttf_addon())
+	{
+		err.errorNum = AL_ADDON_ERROR;
+		err.detail = "Error al iniciar el Font Addon de Allegro!";
+	}
 	if (!al_init_primitives_addon())
 	{
 		err.errorNum = AL_ADDON_ERROR;
@@ -30,6 +36,12 @@ Menu(Image * images_, int number_of_images)
 	{
 		err.errorNum = AL_DISPLAY_ERROR;
 		err.detail = "Error al iniciar el Display!";
+	}
+	font = al_load_ttf_font("Files/ARCADE_N.ttf", 10, 0);
+	if (font == NULL)
+	{
+		err.errorNum = AL_FONT_ERROR;
+		err.detail = "Error al iniciar el Font!";
 	}
 	if (!al_install_keyboard())
 	{
@@ -49,11 +61,11 @@ Menu(Image * images_, int number_of_images)
 	currImg = 0;
 	page = 0;
 	maxPage = ceil((imageCount / ((double) MAX_MENU_IMG)))-1;
-	/*for (int i = 0; i < imageCount; i++)
+	myImages = (myImage *) malloc(imageCount * sizeof(myImages));
+	for (int i = 0; i < imageCount; i++)
 	{
-		myImages[i].img = images_;
-		images_++;
-	}*/
+		myImages[i].img = images_ + i;
+	}
 }
 
 Menu::
@@ -63,11 +75,13 @@ Menu::
 	{
 		al_destroy_bitmap(myImages[i].bmp);
 	}
+	free(myImages);
 	al_uninstall_keyboard();
 	al_destroy_display(display);
 	al_destroy_event_queue(alEventQueue);
 	al_shutdown_image_addon();
 	al_shutdown_font_addon();
+	al_shutdown_ttf_addon();
 	al_shutdown_primitives_addon();
 }
 
@@ -77,7 +91,12 @@ openImages()
 	for (int i = 0; i < imageCount; i++)
 	{
 		myImages[i].bmp = al_load_bitmap(myImages[i].img->getFilename().c_str());
+		if (myImages[i].bmp == NULL)
+		{
+			myImages[i].bmp = al_load_bitmap("Files/default.jpg");
+		}
 	}
+	updateOnScreenImages();
 }
 
 void Menu::
@@ -107,7 +126,7 @@ selectImage(data_t key)
 			currImg++;
 		}
 	}
-	else
+	else if(key != KEY_ESC && key != KEY_ENTER && key != KEY_LEFT && key != KEY_RIGHT && key != KEY_NONE && key != KEY_UP)
 	{
 		onScreenImages[key]->img->toggleSelect();
 	}
@@ -145,57 +164,63 @@ updateOnScreenImages()
 void Menu::
 updateMenu()
 {
-	double x, y;
-	x = (COL_SIZE / 2.0) + MARGIN;
-	//Hago que currImg apunte al primer elemento del display
-	if (currImg % MAX_MENU_IMG == 0 && currImg != 0)//caso que estaba apuntando al ultimo elemento
+	al_clear_to_color(al_map_rgb(255, 255, 255));
+	if (myEvent.eventType == EV_FUNC_BEGIN)
 	{
-		currImg -= MAX_MENU_IMG;
+
+	}
+	else if (myEvent.eventType == EV_FUNC_END)
+	{
+
 	}
 	else
 	{
-		while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
+		double x, y;
+		x = (COL_SIZE / 2.0) + MARGIN;
+		//Hago que currImg apunte al primer elemento del display
+		if (currImg % MAX_MENU_IMG == 0 && currImg != 0)//caso que estaba apuntando al ultimo elemento
 		{
-			currImg--;
+			currImg -= MAX_MENU_IMG;
 		}
-	}
-	al_clear_to_color(al_map_rgb(255, 255, 255));
-	int buff = currImg;
-	while (currImg < buff + MAX_MENU_IMG || currImg < imageCount)
-	{
-		for (int i = 0; i < (MAX_MENU_IMG / 3); i++)
+		else
 		{
-			y = (IMG_SIZE / 2.0) + MARGIN;
-			for (int j = 0; j < (MAX_MENU_IMG / 3); j++)
+			while (!(currImg % MAX_MENU_IMG == 0))//cualquier otro elemento
 			{
-				//Marcador de imagenes seleccionadas(se hace un contorno amarillo de la imagen):
-				/*
-				if(onScreenImages[(currImg - (page*MAX_MENU_IMG))]->isSelected())
-				{
-					al_draw_filled_rectangle((x - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-											(y - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
-											(x + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
-											(y + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
-											al_map_rgb(255,255,0));
-				}
-				*/
-
-				al_draw_filled_rectangle((x - (IMG_SIZE / 2.0)),
-					(y - (IMG_SIZE / 2.0)),
-					(x + (IMG_SIZE / 2.0)),
-					(y + (IMG_SIZE / 2.0)),
-					al_map_rgb(255, 0, 0));
-				//cambiar por:
-				/* al_draw_scaled_bitmap(myImages[currImg].bmp,
-										0, 0,
-										get_bitmap_width(myImages[currImg].bmp), get_bitmap_height(myImages[currImg].bmp),
-										(x - (IMG_SIZE/2.0)), (y - (IMG_SIZE/2.0)),
-										IMG_SIZE, IMG_SIZE, 0);
-				*/
-				currImg++;
-				y += (IMG_SIZE + MARGIN);
+				currImg--;
 			}
-			x += (COL_SIZE + MARGIN);
+		}
+		int buff = currImg;
+		while (currImg < buff + MAX_MENU_IMG || currImg < imageCount)
+		{
+			for (int i = 0; i < (MAX_MENU_IMG / 3) && !(currImg < buff + MAX_MENU_IMG); i++)
+			{
+				y = (IMG_SIZE / 2.0) + MARGIN/2.0;
+				for (int j = 0; j < (MAX_MENU_IMG / 3) && !(currImg < buff + MAX_MENU_IMG); j++)
+				{
+					//Marcador de imagenes seleccionadas(se hace un contorno amarillo de la imagen):
+					
+					if(onScreenImages[(currImg - (page*MAX_MENU_IMG))]->img->isSelected())
+					{
+						al_draw_filled_rectangle((x - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
+												(y - (IMG_SIZE/2.0) - (MARGIN / 5.0)),
+												(x + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
+												(y + (IMG_SIZE/2.0) + (MARGIN / 5.0)),
+												al_map_rgb(255,255,0));
+					}
+					
+					 al_draw_scaled_bitmap(myImages[currImg].bmp,
+											0, 0,
+											al_get_bitmap_width(myImages[currImg].bmp), al_get_bitmap_height(myImages[currImg].bmp),
+											(x - (IMG_SIZE/2.0)), (y - (IMG_SIZE/2.0)),
+											IMG_SIZE, IMG_SIZE, 0);
+					 al_draw_text(font, al_map_rgb(0, 0, 0), x, y + IMG_SIZE / 2.0 + MARGIN / 2.0, ALLEGRO_ALIGN_CENTRE, myImages[currImg].img->getFilename().c_str());
+					
+					currImg++;
+					y += (IMG_SIZE + MARGIN);
+					al_flip_display();
+				}
+				x += (COL_SIZE + MARGIN);
+			}
 		}
 	}
 	al_flip_display();
@@ -382,4 +407,8 @@ void Menu::
 printError()
 {
 	cout << err.detail.c_str() << endl;
+	if (err.errorNum != NO_ERR)
+	{
+		exit = 1;
+	}
 }

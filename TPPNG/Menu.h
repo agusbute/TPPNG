@@ -23,7 +23,7 @@ typedef struct
 	string detail;
 }errorType_t;
 
-typedef enum { NONE, KEY_DOWN, EV_KEY_UP, EV_FUNC_END }evType_t;
+typedef enum { NONE, KEY_DOWN, EV_KEY_UP, EV_FUNC_END, EV_FUNC_BEGIN}evType_t;
 typedef enum { KEY_1 = 0, KEY_2, KEY_3, KEY_4, KEY_5, KEY_6, KEY_7, KEY_8, KEY_9, KEY_NONE, KEY_LEFT, KEY_RIGHT, KEY_A, KEY_N, KEY_ESC, FUNC_END, KEY_ENTER, KEY_UP}data_t;
 
 typedef struct
@@ -70,7 +70,8 @@ private:
 	ALLEGRO_DISPLAY * display;
 	ALLEGRO_EVENT alEvent;
 	ALLEGRO_EVENT_QUEUE * alEventQueue;
-	string * finames;
+	ALLEGRO_FONT * font;
+	event_t myEvent;
 	bool exit;
 
 };

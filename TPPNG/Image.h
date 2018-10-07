@@ -22,6 +22,8 @@ public:
 	unsigned int width;	unsigned  int height;	unsigned char * img;
 
 	Image& operator=(Image& img);
+	Image& operator=(const char* name);
+	Image& operator=(string& name);
 
 private:
 	string filename;

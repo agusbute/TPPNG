@@ -13,6 +13,22 @@ Image::Image(string filename)
 {
 	this->filename = filename;
 	lodepng_decode24_file(&img,&width,&height,filename.c_str());
+	selected = false;
+}
+
+Image& Image::operator=(const char* name)
+{
+	this->filename = name;
+	lodepng_decode24_file(&(this->img), &(this->width), &(this->height), (this->filename.c_str()));
+	this->selected = false;
+	return *this;
+}
+
+Image& Image::operator=(string& name)
+{
+	this->filename = name;
+	lodepng_decode24_file(&(this->img), &(this->width), &(this->height), (this->filename.c_str()));
+	return *this;
 }
 
 Image& Image::operator=(Image& img)
@@ -27,15 +43,15 @@ Image& Image::operator=(Image& img)
 
 bool Image::isSelected()
 {
-	return selected;
+	return this->selected;
 }
 
 void Image::toggleSelect()
 {
-	selected = !selected;
+	this->selected = !this->selected;
 }
 
 string Image::getFilename()
 {
-	return filename;
+	return this->filename;
 }
