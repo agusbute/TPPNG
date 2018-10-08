@@ -59,10 +59,10 @@
     <ClCompile Include="lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parselib.c">
+    <ClCompile Include="callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="callback.c">
+    <ClCompile Include="parselib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

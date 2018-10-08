@@ -429,9 +429,12 @@ encodeImage(bool coder(Image& img, unsigned int threshold), int inputT)
 	updateMenu();
 	for (int i = 0; i < MAX_MENU_IMG; i++)
 	{
-		if (onScreenImages[i]->img->isSelected())
+		if (onScreenImages[i] != NULL)
 		{
-			ret &= coder(*(onScreenImages[i]->img), inputT);
+			if (onScreenImages[i]->img->isSelected())
+			{
+				ret &= coder(*(onScreenImages[i]->img), inputT);
+			}
 		}
 	}
 	myEvent = { EV_FUNC_END, FUNC_END };

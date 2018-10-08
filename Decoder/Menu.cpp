@@ -243,7 +243,7 @@ updateMenu()
 	}
 	else if (myEvent.eventType == EV_FUNC_END)
 	{
-		string output = "CODIFICACION COMPLETA \nPRESIONE LA TECLA ESC O CIERRE LA VENTANA PARA SALIR.";
+		string output = "CODIFICACION COMPLETA. \R\NPRESIONE LA TECLA ESC O CIERRE LA VENTANA PARA SALIR.";
 		al_draw_text(font, al_map_rgb(0, 0, 0), WIDTH / 2.0, HEIGHT / 2.0, ALLEGRO_ALIGN_CENTRE, output.c_str());
 	}
 	else
@@ -429,14 +429,17 @@ decodeImage(bool coder(string img))
 	updateMenu();
 	for (int i = 0; i < MAX_MENU_IMG; i++)
 	{
-		if (onScreenImages[i]->img->isSelected())
+		if(onScreenImages[i] != NULL)
 		{
-			string input = onScreenImages[i]->img->getFilename();
-			for (int i = 4; i > 0; i--)
+			if (onScreenImages[i]->img->isSelected())
 			{
-				input.pop_back();
+				string input = onScreenImages[i]->img->getFilename();
+				for (int i = 4; i > 0; i--)
+				{
+					input.pop_back();
+				}
+				ret &= (coder(input));
 			}
-			ret &= (coder(input));
 		}
 	}
 	myEvent = { EV_FUNC_END, FUNC_END };

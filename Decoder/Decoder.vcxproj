@@ -163,6 +163,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Callback.h" />
     <ClInclude Include="Decoder.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="lodepng.h" />
@@ -175,9 +176,9 @@
     <ClCompile Include="Decoder.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="main.c" />
+    <ClCompile Include="callback.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="parselib.c" />
+    <ClCompile Include="parselib.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

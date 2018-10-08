@@ -1,15 +1,12 @@
 #pragma once
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "callback.h"
+#include "stdafx.h"
+#include "parselib.h"
 
-#define ARGUMENTOS 4
+#define ARGUMENTOS 1
 
 typedef struct
 {
-	char * path;
-	int threshold;
+	char *path;
 }argument_t;
 
 

@@ -36,6 +36,9 @@
     <ClInclude Include="parselib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Callback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -56,10 +59,10 @@
     <ClCompile Include="Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main.c">
+    <ClCompile Include="parselib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="parselib.c">
+    <ClCompile Include="callback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

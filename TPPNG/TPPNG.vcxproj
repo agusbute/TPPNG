@@ -177,9 +177,9 @@
     <ClCompile Include="Encode.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="lodepng.cpp" />
-    <ClCompile Include="callback.c" />
+    <ClCompile Include="callback.cpp" />
     <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="parselib.c" />
+    <ClCompile Include="parselib.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
