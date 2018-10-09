@@ -7,10 +7,11 @@
 
 int main(int argc, const char ** argv)
 {
-	int num_of_images = 1;
+	int num_of_images = 2;
 	Image * images = new Image[num_of_images];
 	//agragar boost::filesystem, guardar cada imagen ahi
-	images[0] = "Files/cuadrados.png";
+	images[0] = "Files/cuadrados.boi";
+	images[1] = "Files/test.boi";
 	Menu menu(images, num_of_images);
 	menu.printError();
 	menu.openImages();

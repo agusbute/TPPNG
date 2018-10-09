@@ -12,13 +12,13 @@ int parseCallback(char *key, char *value, void *UserData)
 	//Evaluo la clave
 	if(key!=NULL)
 	{
-		if((strcasecmp(key,"threshold")) == 0)
+		if((strcasecmp(key,"path")) == 0)
 		{
 			pUserData->path = value;	//le asigna su valor
 			result = 1;
 		}
 		
-		else if((strcasecmp(key,"path")) == 0)
+		else if((strcasecmp(key,"threshold")) == 0)
 		{
 			pUserData->threshold = atoi(value);
 			result = 1;		

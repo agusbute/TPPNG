@@ -13,7 +13,7 @@ bool Encode(Image& image, unsigned int threshold)
 		Infile.pop_back();								//borro el ".png"
 	}
 	string outfile = Infile + "BOI";					//pongo terminacion nueva
-	output.open(outfile);								//creo el archivo
+	output.open(outfile,ios::binary);								//creo el archivo
 	if (h >= 4096)										//4096 = 0x1000
 	{
 		output << std::hex << h;
@@ -39,15 +39,15 @@ void EncodeRec(unsigned char * img, ofstream& output, int threshold, unsigned le
 {
 	unsigned char Rprom, Gprom, Bprom;
 		
-	if ((puntaje(img, length, BMPsize)) > threshold)
+	if ((puntaje(img, length, BMPsize)) > threshold && length != 1)
 	{
 		output << 'N';
 		int corrimiento1 = (length / 2) * 4;					
 		int corrimiento2 = (length / 2) * 4 * length;
-		int corrimiento3 = (length / 2) * 4 + (length / 2);
-
-		EncodeRec(img + corrimiento1, output, threshold, length / 2, BMPsize);
+		//int corrimiento3 = (length / 2) * 4 + (length / 2);
+		int corrimiento3 = corrimiento1 + corrimiento2;
 		EncodeRec(img, output, threshold, length / 2, BMPsize);
+		EncodeRec(img + corrimiento1, output, threshold, length / 2, BMPsize);
 		EncodeRec(img + corrimiento2, output , threshold, length / 2, BMPsize);
 		EncodeRec(img + corrimiento3, output, threshold, length / 2, BMPsize);
 	}
@@ -66,6 +66,7 @@ unsigned char promedioR(unsigned char * img, unsigned length, unsigned BMPsize)
 {
 	unsigned int Rvalue = 0;
 	unsigned int cont = 0;
+	
 	for (unsigned int fila = 0; fila < length; fila++)		//recorro todo el quadtree calculando el promedio
 	{
 		for (unsigned int columna = 0; columna < length; columna++)
@@ -127,7 +128,7 @@ int puntaje(unsigned char * image, unsigned length, unsigned BMPsize)		//esto es
 
 	for (; fila < length; fila++)					//recorro todo el raw pixel data
 	{
-		for (; columna < length; columna++)		//paso a buscar los valores minimos y maximos de los colores
+		for (columna = 0; columna < length; columna++)		//paso a buscar los valores minimos y maximos de los colores
 		{
 
 			if (image[4 * (fila * BMPsize + columna) + 1] < Gmin)		//busco el minimo verde
