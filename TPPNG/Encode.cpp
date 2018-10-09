@@ -10,19 +10,26 @@ bool Encode(Image& image, unsigned int threshold)
 	string Infile(image.getFilename().c_str());
 	for (int i = 3; i != 0; i--)
 	{
-		Infile.pop_back();								//borro el .png
+		Infile.pop_back();								//borro el ".png"
 	}
 	string outfile = Infile + "BOI";					//pongo terminacion nueva
 	output.open(outfile);								//creo el archivo
-	if (!(h < 4096))
+	if (h >= 4096)										//4096 = 0x1000
 	{
 		output << std::hex << h;
 
 	}
-	else
+	else if (h < 4096 && h >= 256)
 	{
 		output << 0x00 << std::hex << h;
-
+	}
+	else if (h<256 && h>= 16)
+	{
+		output << 0x00 << 0x00 << std::hex << h;
+	}
+	else
+	{
+		output << 0x00 << 0x00 << 0x00 << std::hex << h;
 	}
 	EncodeRec(image.img, output, (unsigned char) ceil(threshold * 2.55), w, w);
 	return true;

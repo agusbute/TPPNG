@@ -243,7 +243,7 @@ updateMenu()
 	}
 	else if (myEvent.eventType == EV_FUNC_END)
 	{
-		string output = "CODIFICACION COMPLETA \nPRESIONE LA TECLA ESC O CIERRE LA VENTANA PARA SALIR.";
+		string output = "CODIFICACION COMPLETA PRESIONE LA TECLA ESC O CIERRE LA VENTANA PARA SALIR.";
 		al_draw_text(font, al_map_rgb(0, 0, 0), WIDTH / 2.0, HEIGHT / 2.0, ALLEGRO_ALIGN_CENTRE, output.c_str());
 	}
 	else
