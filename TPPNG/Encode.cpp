@@ -31,7 +31,7 @@ bool Encode(Image& image, unsigned int threshold)
 	{
 		output << 0x00 << 0x00 << 0x00 << std::hex << h;
 	}
-	EncodeRec(image.img, output, (unsigned char) ceil(threshold * 2.55), w, w);
+	EncodeRec(image.img, output, (unsigned int) ceil(threshold * 7.65), w, w);
 	return true;
 }
 

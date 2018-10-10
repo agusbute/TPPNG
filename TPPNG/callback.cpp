@@ -20,8 +20,15 @@ int parseCallback(char *key, char *value, void *UserData)
 		
 		else if((strcasecmp(key,"threshold")) == 0)
 		{
-			pUserData->threshold = atoi(value);
-			result = 1;		
+			if (atoi(value) <= 100 && atoi(value) >= 0)
+			{
+				pUserData->threshold = atoi(value);
+				result = 1;
+			}
+			else
+			{
+				result = 0;
+			}
 		}	
 
     }
