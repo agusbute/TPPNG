@@ -43,7 +43,7 @@ void EncodeRec(unsigned char * img, ofstream& output, int threshold, unsigned le
 	{
 		output << 'N';
 		int corrimiento1 = (length / 2) * 4;					
-		int corrimiento2 = (length / 2) * 4 * length;
+		int corrimiento2 = (length / 2) * 4 * BMPsize;
 		//int corrimiento3 = (length / 2) * 4 + (length / 2);
 		int corrimiento3 = corrimiento1 + corrimiento2;
 		EncodeRec(img, output, threshold, length / 2, BMPsize);
