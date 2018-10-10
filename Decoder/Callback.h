@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "parselib.h"
 
-#define ARGUMENTOS 1
+#define ARGUMENTOS 2
 
 typedef struct
 {

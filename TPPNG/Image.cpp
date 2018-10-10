@@ -12,14 +12,14 @@ Image::Image()
 Image::Image(string filename)
 {
 	this->filename = filename;
-	lodepng_decode32_file(&img,&width,&height,filename.c_str());
+	int i = lodepng_decode32_file(&img,&width,&height,filename.c_str());
 	selected = false;
 }
 
 Image& Image::operator=(const char* name)
 {
 	this->filename = name;
-	lodepng_decode32_file(&(this->img), &(this->width), &(this->height), (this->filename.c_str()));
+	int i = lodepng_decode32_file(&(this->img), &(this->width), &(this->height), (this->filename.c_str()));
 	this->selected = false;
 	return *this;
 }
@@ -28,6 +28,7 @@ Image& Image::operator=(string& name)
 {
 	this->filename = name;
 	lodepng_decode32_file(&(this->img), &(this->width), &(this->height), (this->filename.c_str()));
+	this->selected = false;
 	return *this;
 }
 

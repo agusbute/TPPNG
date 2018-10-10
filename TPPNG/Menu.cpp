@@ -60,7 +60,7 @@ Menu(Image * images_, int number_of_images)
 	imageCount = number_of_images;
 	currImg = 0;
 	page = 0;
-	if (imageCount < MAX_MENU_IMG)
+	if (imageCount <= MAX_MENU_IMG)
 	{
 		maxPage = 0;
 	}

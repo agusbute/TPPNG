@@ -16,7 +16,7 @@ using namespace boost::filesystem;
 #define ARCHIVO_EXISTE "hola.txt"
 #define ARCHIVO_INEXISTE "no_hola.txt"
 
-int see_dirContent(const char* dir,const char **);
+int see_dirContent(const char* dir,string *);
 
 
 

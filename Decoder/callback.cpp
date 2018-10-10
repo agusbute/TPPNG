@@ -24,7 +24,6 @@ void how_to_use(void)
 {
 	printf("Se deben ingresar los valores para las siguientes opciones: \n");
 	printf("-path \n");
-    printf("Estas pueden estar en cualquier orden. De no completar un minimo de 7 argumentos, el programa indicara un error de parametros.\n");
 }
 
 int strcasecmp(const char * str1, const char * str2)

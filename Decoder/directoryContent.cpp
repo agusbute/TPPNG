@@ -18,7 +18,7 @@ int see_dirContent(const char* dir, string * filenameArray)
 		{
 			for (directory_iterator itr(p); itr != directory_iterator(); itr++)
 			{
-				if (itr->path().filename().extension() == ".png")
+				if (itr->path().filename().extension() == ".BOI")
 				{
 					filenameArray[i] = p.generic_string() + "/" + itr->path().filename().generic_string();
 					counter++;
